@@ -60,4 +60,13 @@ export class UsersService {
 
     return await this.usersRipository.save(user);
   }
+
+  async findAll(limit: number = 2, page: number = 1) {
+    const users = await this.usersRipository.find({
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return users;
+  }
 }
