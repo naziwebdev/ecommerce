@@ -1,9 +1,11 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import {ConfigService} from '@nestjs/config'
-
+import * as bcrypt from 'bcrypt'
+import { User } from 'src/users/entities/user.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +35,30 @@ export class AuthService {
         expiresIn:this.configService.get('JWT_EXPIRESIN')
     });
 
-    return accessToken
+    return {accessToken,user:plainToInstance(User,user)}
+  }
+
+
+  async login(phone:string,password:string){
+
+    const user = await this.usersService.findByPhone(phone)
+    if(!user){
+        throw new NotFoundException('phone or password is incorrect')
+    }
+
+    const isValidPassword = await bcrypt.compare(password,user.password)
+    if(!isValidPassword){
+        throw new NotFoundException('phone or password is incorrect')
+    }
+    
+    const accessToken = this.jwtService.sign({
+        userId: user.id,
+        username: user.username,
+      },{
+          secret:this.configService.get('JWT_SECRET_KEY'),
+          expiresIn:this.configService.get('JWT_EXPIRESIN')
+      });
+  
+      return {accessToken,user:plainToInstance(User,user)}
   }
 }
