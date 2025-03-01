@@ -38,8 +38,9 @@ export class UsersService {
   async create(
     createUserDto: CreateUserDto,
     hashedPassword: string,
-    usersCount: number,
   ) {
+
+    const usersCount = await this.usersRipository.count()
     const newUser = await this.usersRipository.create({
       ...createUserDto,
       password: hashedPassword,
