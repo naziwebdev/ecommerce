@@ -6,21 +6,39 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from 'src/users/users.module';
+import { RefreshStrategy } from './strategies/refresh.strategy';
 
 @Module({
-  imports: [
-    UsersModule,
-    PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET_KEY'),
-        signOptions: { expiresIn: configService.get('JWT_EXPIRESIN') },
-      }),
-    }),
-  ],
+  imports: [UsersModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController],
-  providers: [AuthService,JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    RefreshStrategy,
+    {
+      provide: 'JWT_SECRET_KEY',
+      useFactory: (configService: ConfigService) =>
+        configService.get('JWT_SECRET_KEY'),
+      inject: [ConfigService],
+    },
+    {
+      provide: 'JWT_EXPIRESIN',
+      useFactory: (configService: ConfigService) =>
+        configService.get('JWT_EXPIRESIN'),
+      inject: [ConfigService],
+    },
+    {
+      provide: 'REFRESH_SECRET_KEY',
+      useFactory: (configService: ConfigService) =>
+        configService.get('REFRESH_SECRET_KEY'),
+      inject: [ConfigService],
+    },
+    {
+      provide: 'REFRESH_EXPIRESIN',
+      useFactory: (configService: ConfigService) =>
+        configService.get('REFRESH_EXPIRESIN'),
+      inject: [ConfigService],
+    },
+  ],
 })
 export class AuthModule {}
