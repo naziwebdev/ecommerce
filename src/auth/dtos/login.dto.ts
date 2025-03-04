@@ -8,7 +8,7 @@ import {
   import { Transform } from "class-transformer";
   
   
-  export class CreateUserDto {
+  export class loginDto {
   
     @IsString({ message: 'phone must be string' })
     @IsNotEmpty({ message: 'phone is required' })
