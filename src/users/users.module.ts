@@ -7,9 +7,9 @@ import { CreateUserDto } from './dtos/create-user.dto';
 
 
 @Module({
-  imports:[TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
-  providers: [UsersService,CreateUserDto],
-  exports:[UsersService,CreateUserDto]
+  providers: [UsersService, CreateUserDto],
+  exports: [UsersService, CreateUserDto],
 })
 export class UsersModule {}

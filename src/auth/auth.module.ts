@@ -7,6 +7,8 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from 'src/users/users.module';
 import { RefreshStrategy } from './strategies/refresh.strategy';
+import { CurrentUserMiddleware } from 'src/middlewares/current-user.middleware';
+import { MiddlewareConsumer } from '@nestjs/common';
 
 @Module({
   imports: [UsersModule, PassportModule, JwtModule.register({})],
@@ -41,4 +43,9 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
     },
   ],
 })
-export class AuthModule {}
+export class AuthModule {
+    //set middleware global for all routes
+    configure(consumer: MiddlewareConsumer) {
+      consumer.apply(CurrentUserMiddleware).forRoutes('*');
+    }
+}

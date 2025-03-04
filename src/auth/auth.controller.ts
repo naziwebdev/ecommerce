@@ -1,8 +1,20 @@
-import { Controller, Body, Post, Res, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Post,
+  Res,
+  HttpStatus,
+  UseGuards,
+  Get,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { loginDto } from './dtos/login.dto';
 import { Response } from 'express';
+import { GetUser } from 'src/decorators/get-user.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { plainToClass } from 'class-transformer';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -27,6 +39,17 @@ export class AuthController {
       data: user,
       statusCode: HttpStatus.OK,
       message: 'user login successfully',
+    });
+  }
+
+  @Get('/me')
+  @UseGuards(AuthGuard)
+  getMe(@GetUser() user: User, @Res() res: Response) {
+    const mainUser = plainToClass(User, user);
+    return res.status(HttpStatus.OK).json({
+      data: mainUser,
+      statusCode: HttpStatus.OK,
+      message: 'user data send successfully',
     });
   }
 }

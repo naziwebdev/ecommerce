@@ -1,29 +1,32 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { CanActivate, ExecutionContext, Injectable, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
-//for auth-guard and set user on request such as express auth middleware => we dont need to middleware that set user on request
+import { ConfigService } from '@nestjs/config';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    private reflector: Reflector,
+    private configService: ConfigService, 
   ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(' ')[1];
+    const authorizationHeader = request.headers.authorization;
+    if (!authorizationHeader) {
+      return false;
+    }
+
+    const token = authorizationHeader.split(' ')[1];
     if (!token) {
       return false;
     }
 
     try {
-      const user = this.jwtService.verify(token);
-      request.user = user;
-      return true;
+      const secretKey = this.configService.get<string>('JWT_SECRET_KEY');
+      const user = this.jwtService.verify(token, { secret: secretKey });
+      return user.userId
     } catch (error) {
+      console.error('JWT Verification Error:', error.message);
       return false;
     }
   }
