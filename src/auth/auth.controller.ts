@@ -16,17 +16,17 @@ export class AuthController {
       data: newUser,
       statusCode: HttpStatus.CREATED,
       message: 'user registered successfully',
-    });   
+    });
   }
 
   @Post('/login')
-  async login(@Body() body: CreateUserDto, @Res() res: Response) {
-    const user = await this.authService.login(body.phone,body.password);
+  async login(@Body() body: loginDto, @Res() res: Response) {
+    const user = await this.authService.login(body.phone, body.password);
 
     return res.status(HttpStatus.OK).json({
       data: user,
       statusCode: HttpStatus.OK,
       message: 'user login successfully',
-    });   
+    });
   }
 }

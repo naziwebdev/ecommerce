@@ -35,19 +35,15 @@ export class UsersService {
     return hashedPassword;
   }
 
-  async create(
-    createUserDto: CreateUserDto,
-    hashedPassword: string,
-  ) {
-
-    const usersCount = await this.usersRipository.count()
+  async create(createUserDto: CreateUserDto, hashedPassword: string) {
+    const usersCount = await this.usersRipository.count();
     const newUser = await this.usersRipository.create({
       ...createUserDto,
       password: hashedPassword,
       role: usersCount > 0 ? UserRoleEnum.USER : UserRoleEnum.ADMIN,
     });
 
-    return newUser;
+    return this.usersRipository.save(newUser);
   }
 
   async update(updateUserDto: UpdateUserDto, id: number) {
