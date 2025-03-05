@@ -5,7 +5,6 @@ import { User } from './entities/user.entity';
 import { UserRoleEnum } from './enums/user-role-enum';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { ChangePasswordDto } from './dtos/change-password.dto';
 import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 
@@ -70,5 +69,20 @@ export class UsersService {
     const allUser = users.map((user) => plainToInstance(User, user));
 
     return allUser;
+  }
+
+  async changePassword(password:string,id:number){
+
+    const user = await this.usersRipository.findOne({where:{id}})
+    if(!user){
+      throw new NotFoundException('user not found')
+    }
+
+    const hashedPassword =await this.hashPassword(password)
+    user.password = hashedPassword
+
+    const confirmUser = await this.usersRipository.save(user)
+    return plainToInstance(User,confirmUser)
+
   }
 }
