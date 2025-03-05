@@ -7,6 +7,8 @@ import {
   UseGuards,
   Post,
   Put,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -28,6 +30,24 @@ export class CategoriesController {
       data: newCategory,
       statusCode: HttpStatus.CREATED,
       message: 'category created successfully',
+    });
+  }
+
+  @Get()
+  async getAll(
+    @Query('limit') limit: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {
+    const categories = await this.categoriesService.findAll(
+      parseInt(limit),
+      parseInt(page),
+    );
+
+    return res.status(HttpStatus.OK).json({
+      data: categories,
+      statusCode: HttpStatus.OK,
+      message: 'categoris get successfully',
     });
   }
 
