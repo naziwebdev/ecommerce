@@ -9,6 +9,7 @@ import {
   Put,
   Get,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -64,6 +65,21 @@ export class CategoriesController {
       data: category,
       statusCode: HttpStatus.OK,
       message: 'category updated successfully',
+    });
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  async remove(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+     await this.categoriesService.remove(parseInt(id));
+
+    return res.status(HttpStatus.OK).json({
+      data:null,
+      statusCode: HttpStatus.OK,
+      message: 'category removed successfully',
     });
   }
 }
