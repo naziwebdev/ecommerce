@@ -9,6 +9,7 @@ import {
   Query,
   Param,
   Put,
+  Delete,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -78,6 +79,18 @@ export class ProductsController {
       data: product,
       statusCode: HttpStatus.OK,
       message: 'product get successfully',
+    });
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  async remove(@Param('id') id: string, @Res() res: Response) {
+    await this.productsService.remove(parseInt(id));
+
+    return res.status(HttpStatus.OK).json({
+      data: null,
+      statusCode: HttpStatus.OK,
+      message: 'product removed successfully',
     });
   }
 }
