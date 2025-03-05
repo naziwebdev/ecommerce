@@ -7,12 +7,15 @@ import {
   HttpStatus,
   Get,
   Query,
+  Param,
+  Put,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
 import { RoleGuard } from 'src/guards/role.guard';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { Response } from 'express';
+import { UpdateProductDto } from './dtos/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -45,6 +48,25 @@ export class ProductsController {
       data: products,
       statusCode: HttpStatus.OK,
       message: 'products get successfully',
+    });
+  }
+
+  @Put('/:id')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  async update(
+    @Body() body: UpdateProductDto,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const updatedProduct = await this.productsService.update(
+      body,
+      parseInt(id),
+    );
+
+    return res.status(HttpStatus.OK).json({
+      data: updatedProduct,
+      statusCode: HttpStatus.OK,
+      message: 'product updated successfully',
     });
   }
 }

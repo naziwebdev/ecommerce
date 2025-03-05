@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { Category } from 'src/categories/entities/category.entity';
+import { UpdateProductDto } from './dtos/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -52,5 +53,16 @@ export class ProductsService {
     });
 
     return products;
+  }
+
+  async update(updatedProductDto: UpdateProductDto, id: number) {
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('not found product');
+    }
+
+    Object.assign(product, updatedProductDto);
+
+    return await this.productsRepository.save(product);
   }
 }
