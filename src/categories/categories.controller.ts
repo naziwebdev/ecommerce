@@ -6,12 +6,14 @@ import {
   Param,
   UseGuards,
   Post,
+  Put,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
 import { RoleGuard } from 'src/guards/role.guard';
 import { Response } from 'express';
 import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -26,6 +28,22 @@ export class CategoriesController {
       data: newCategory,
       statusCode: HttpStatus.CREATED,
       message: 'category created successfully',
+    });
+  }
+
+  @Put('/:id')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  async update(
+    @Body() body: UpdateCategoryDto,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const category = await this.categoriesService.update(body, parseInt(id));
+
+    return res.status(HttpStatus.OK).json({
+      data: category,
+      statusCode: HttpStatus.OK,
+      message: 'category updated successfully',
     });
   }
 }
