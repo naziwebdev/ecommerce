@@ -56,7 +56,9 @@ export class UsersService {
 
     user.username = updateUserDto.username;
 
-    return await this.usersRipository.save(user);
+    const updatedUser = await this.usersRipository.save(user);
+
+    return plainToInstance(User, updateUserDto);
   }
 
   async findAll(limit: number = 2, page: number = 1) {
@@ -65,8 +67,8 @@ export class UsersService {
       skip: (page - 1) * limit,
     });
 
-    const allUser = users.map(user => plainToInstance(User,user))
+    const allUser = users.map((user) => plainToInstance(User, user));
 
-    return allUser
+    return allUser;
   }
 }
