@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+ManyToOne
 } from 'typeorm';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity('products')
 export class Product {
@@ -25,6 +27,9 @@ export class Product {
 
   @Column({ nullable: false, default: 0 })
   stock: number;
+
+  @ManyToOne(() => Category , (category) => category.products)
+  category:Category
 
   @CreateDateColumn({
     name: 'created_at',
