@@ -65,4 +65,16 @@ export class ProductsService {
 
     return await this.productsRepository.save(product);
   }
+
+  async findByHref(href: string) {
+    const product = await this.productsRepository.findOne({
+      where: { href },
+      relations: ['category'],
+    });
+    if (!product) {
+      throw new NotFoundException('not found product');
+    }
+
+    return product;
+  }
 }

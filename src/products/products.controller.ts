@@ -69,4 +69,15 @@ export class ProductsController {
       message: 'product updated successfully',
     });
   }
+
+  @Get('/:href')
+  async findByHref(@Param('href') href: string, @Res() res: Response) {
+    const product = await this.productsService.findByHref(href);
+
+    return res.status(HttpStatus.OK).json({
+      data: product,
+      statusCode: HttpStatus.OK,
+      message: 'product get successfully',
+    });
+  }
 }
