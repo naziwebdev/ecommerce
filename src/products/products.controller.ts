@@ -5,6 +5,8 @@ import {
   Body,
   Res,
   HttpStatus,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -25,6 +27,24 @@ export class ProductsController {
       data: product,
       statusCode: HttpStatus.CREATED,
       message: 'product created successfully',
+    });
+  }
+
+  @Get()
+  async getAll(
+    @Query('limit') limit: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {
+    const products = await this.productsService.findAll(
+      parseInt(limit),
+      parseInt(page),
+    );
+
+    return res.status(HttpStatus.OK).json({
+      data: products,
+      statusCode: HttpStatus.OK,
+      message: 'products get successfully',
     });
   }
 }
