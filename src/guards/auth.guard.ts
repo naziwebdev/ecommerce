@@ -1,33 +1,22 @@
-import { CanActivate, ExecutionContext, Injectable, Inject } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService, 
-  ) {}
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private reflector: Reflector, private configService: ConfigService) {
+    super();
+  }
 
-  canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const authorizationHeader = request.headers.authorization;
-    if (!authorizationHeader) {
-      return false;
-    }
+  canActivate(context: ExecutionContext) {
+    return super.canActivate(context);
+  }
 
-    const token = authorizationHeader.split(' ')[1];
-    if (!token) {
-      return false;
+  handleRequest(err, user, info, context) {
+    if (err || !user) {
+      throw err || new UnauthorizedException();
     }
-
-    try {
-      const secretKey = this.configService.get<string>('JWT_SECRET_KEY');
-      const user = this.jwtService.verify(token, { secret: secretKey });
-      return user.userId
-    } catch (error) {
-      console.error('JWT Verification Error:', error.message);
-      return false;
-    }
+    return user;
   }
 }

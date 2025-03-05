@@ -12,4 +12,5 @@ import { CreateUserDto } from './dtos/create-user.dto';
   providers: [UsersService, CreateUserDto],
   exports: [UsersService, CreateUserDto],
 })
-export class UsersModule {}
+export class UsersModule {
+}

@@ -12,7 +12,7 @@ import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { loginDto } from './dtos/login.dto';
 import { Response } from 'express';
 import { GetUser } from 'src/decorators/get-user.decorator';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { JwtAuthGuard } from 'src/guards/auth.guard';
 import { plainToClass } from 'class-transformer';
 import { User } from 'src/users/entities/user.entity';
 
@@ -43,7 +43,7 @@ export class AuthController {
   }
 
   @Get('/me')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   getMe(@GetUser() user: User, @Res() res: Response) {
     const mainUser = plainToClass(User, user);
     return res.status(HttpStatus.OK).json({

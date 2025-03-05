@@ -6,6 +6,7 @@ import { UserRoleEnum } from './enums/user-role-enum';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -64,6 +65,8 @@ export class UsersService {
       skip: (page - 1) * limit,
     });
 
-    return users;
+    const allUser = users.map(user => plainToInstance(User,user))
+
+    return allUser
   }
 }
