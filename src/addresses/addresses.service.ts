@@ -25,4 +25,18 @@ export class AddressesService {
 
     return savedAddress;
   }
+
+  async findUserAddresses(user: User) {
+    const addresses = await this.addressesRepository.find({
+      relations: ['user'],
+      where: { user: { id: user.id } },
+    });
+
+    const transformedAddresses = addresses.map((address) => ({
+      ...address,
+      user: plainToInstance(User, address.user),
+    }));
+
+    return transformedAddresses;
+  }
 }

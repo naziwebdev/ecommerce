@@ -5,6 +5,7 @@ import {
   UseGuards,
   Res,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
 import { AddressesService } from './addresses.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -30,6 +31,18 @@ export class AddressesController {
       data: address,
       statusCode: HttpStatus.CREATED,
       message: 'address created successfully',
+    });
+  }
+
+  @Get('/')
+  @UseGuards(JwtAuthGuard)
+  async findUserAddresses(@GetUser() user: User, @Res() res: Response) {
+    const addresses = await this.addressesService.findUserAddresses(user);
+
+    return res.status(HttpStatus.OK).json({
+      data: addresses,
+      statusCode: HttpStatus.OK,
+      message: 'addresses get successfully',
     });
   }
 }
