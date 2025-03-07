@@ -22,10 +22,18 @@ export class AuthController {
 
   @Post('/register')
   async register(@Body() body: CreateUserDto, @Res() res: Response) {
-    const newUser = await this.authService.register(body);
+    const { accessToken, refreshToken, user } =
+      await this.authService.register(body);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
 
     return res.status(HttpStatus.CREATED).json({
-      data: newUser,
+      data: { accessToken, user },
       statusCode: HttpStatus.CREATED,
       message: 'user registered successfully',
     });
@@ -33,10 +41,20 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() body: loginDto, @Res() res: Response) {
-    const user = await this.authService.login(body.phone, body.password);
+    const { accessToken, refreshToken, user } = await this.authService.login(
+      body.phone,
+      body.password,
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
 
     return res.status(HttpStatus.OK).json({
-      data: user,
+      data: { accessToken, user },
       statusCode: HttpStatus.OK,
       message: 'user login successfully',
     });
