@@ -24,7 +24,7 @@ export class Ticket {
   user: User;
 
   //self relation
-  @ManyToOne(() => Ticket, (ticket) => ticket.replies)
+  @ManyToOne(() => Ticket, (ticket) => ticket.replies,{nullable:true})
   replyTo: Ticket;
 
   @OneToMany(() => Ticket, (ticket) => ticket.replyTo)
