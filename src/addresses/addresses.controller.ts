@@ -6,6 +6,8 @@ import {
   Res,
   HttpStatus,
   Get,
+  Put,
+  Param,
 } from '@nestjs/common';
 import { AddressesService } from './addresses.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -13,6 +15,7 @@ import { CreateAddressDto } from './dtos/create-address.dto';
 import { Response } from 'express';
 import { GetUser } from 'src/decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { UpdateAddressDto } from './dtos/update-address.dto';
 
 @Controller('addresses')
 export class AddressesController {
@@ -43,6 +46,27 @@ export class AddressesController {
       data: addresses,
       statusCode: HttpStatus.OK,
       message: 'addresses get successfully',
+    });
+  }
+
+  @Put('/:id')
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Body() body: UpdateAddressDto,
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const addresse = await this.addressesService.update(
+      body,
+      parseInt(id),
+      user,
+    );
+
+    return res.status(HttpStatus.OK).json({
+      data: addresse,
+      statusCode: HttpStatus.OK,
+      message: 'addresses updated successfully',
     });
   }
 }
