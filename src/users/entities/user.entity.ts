@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Address } from 'src/addresses/entities/address.entity';
 import { UserRoleEnum } from '../enums/user-role-enum';
 
 @Entity({ name: 'users' })
@@ -30,6 +32,9 @@ export class User {
     nullable: false,
   })
   role: UserRoleEnum;
+
+  @OneToMany(() => Address , (address) => address.user)
+  addresses:Address[]
 
   @CreateDateColumn({
     name: 'created_at',
