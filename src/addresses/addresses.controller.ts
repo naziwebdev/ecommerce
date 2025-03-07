@@ -8,6 +8,7 @@ import {
   Get,
   Put,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { AddressesService } from './addresses.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -67,6 +68,22 @@ export class AddressesController {
       data: addresse,
       statusCode: HttpStatus.OK,
       message: 'addresses updated successfully',
+    });
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
+  async remove(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const addresse = await this.addressesService.remove(parseInt(id), user);
+
+    return res.status(HttpStatus.OK).json({
+      data: addresse,
+      statusCode: HttpStatus.OK,
+      message: 'addresses removed successfully',
     });
   }
 }

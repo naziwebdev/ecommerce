@@ -1,5 +1,4 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from 'typeorm';
-import { Location } from './location.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'addresses' })
@@ -22,8 +21,12 @@ export class Address {
   @Column({ nullable: true })
   description: string;
 
-  @Column((type) => Location)
-  location: Location;
+  @Column({ type: 'jsonb', nullable: false })
+  location: {
+    lat: number;
+    lng: number;
+    [key: string]: any;
+  };
 
   @Column({ nullable: false, length: 10 })
   postalCode: string;

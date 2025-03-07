@@ -61,8 +61,26 @@ export class AddressesService {
 
     Object.assign(address, updateAddressDto);
 
-    address.user = plainToInstance(User,address.user)
+    address.user = plainToInstance(User, address.user);
 
     return await this.addressesRepository.save(address);
+  }
+
+  async remove(id: number, user: User) {
+    const address = await this.addressesRepository.findOne({
+      relations: ['user'],
+      where: { id },
+    });
+
+    if (address.user.id !== user.id) {
+      throw new ForbiddenException('forbidden this route');
+    }
+
+    if (!address) {
+      throw new NotFoundException('not found address');
+    }
+
+    await this.addressesRepository.remove(address);
+    return true;
   }
 }
