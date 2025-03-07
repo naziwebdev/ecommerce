@@ -45,6 +45,17 @@ export class AddressesService {
     return transformedAddresses;
   }
 
+  async findOne(id: number) {
+    const address = await this.addressesRepository.findOne({
+      relations: ['user'],
+      where: { id},
+    });
+
+    address.user = plainToInstance(User, address.user);
+
+    return address;
+  }
+
   async update(updateAddressDto: UpdateAddressDto, id: number, user: User) {
     const address = await this.addressesRepository.findOne({
       where: { id },

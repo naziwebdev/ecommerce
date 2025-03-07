@@ -50,6 +50,21 @@ export class AddressesController {
     });
   }
 
+  @Get('/:id')
+  @UseGuards(JwtAuthGuard)
+  async findOne(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const addresse = await this.addressesService.findOne(parseInt(id));
+
+    return res.status(HttpStatus.OK).json({
+      data: addresse,
+      statusCode: HttpStatus.OK,
+      message: 'addresses get successfully',
+    });
+  }
+
   @Put('/:id')
   @UseGuards(JwtAuthGuard)
   async update(
