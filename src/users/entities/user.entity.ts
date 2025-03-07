@@ -9,6 +9,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { Address } from 'src/addresses/entities/address.entity';
 import { UserRoleEnum } from '../enums/user-role-enum';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -33,8 +34,11 @@ export class User {
   })
   role: UserRoleEnum;
 
-  @OneToMany(() => Address , (address) => address.user)
-  addresses:Address[]
+  @OneToMany(() => Address, (address) => address.user)
+  addresses: Address[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.user)
+  tickets: Ticket[];
 
   @CreateDateColumn({
     name: 'created_at',
