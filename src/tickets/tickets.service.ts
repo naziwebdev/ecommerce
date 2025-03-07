@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ticket } from './entities/ticket.entity';
@@ -33,5 +37,20 @@ export class TicketsService {
     ticket.user = plainToInstance(User, ticket.user);
 
     return await this.ticketsRepository.save(ticket);
+  }
+
+  async findOne(id: number, user: User) {
+    const ticket = await this.ticketsRepository.findOne({
+      where: { id },
+      relations: ['replies', 'replyTo','user'],
+    });
+
+    if (ticket.user.id !== user.id && user.role !== 'admin') {
+      throw new ForbiddenException('forbidden route');
+    }
+
+    ticket.user = plainToInstance(User, ticket.user);
+
+    return ticket;
   }
 }

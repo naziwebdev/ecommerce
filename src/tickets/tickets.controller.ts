@@ -5,6 +5,8 @@ import {
   UseGuards,
   Res,
   HttpStatus,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -30,6 +32,22 @@ export class TicketsController {
       data: ticket,
       statusCode: HttpStatus.CREATED,
       message: 'ticket created successfully',
+    });
+  }
+
+  @Get('/:id')
+  @UseGuards(JwtAuthGuard)
+  async findOne(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const ticket = await this.ticketsService.findOne(parseInt(id), user);
+
+    return res.status(HttpStatus.OK).json({
+      data: ticket,
+      statusCode: HttpStatus.OK,
+      message: 'ticket get successfully',
     });
   }
 }
