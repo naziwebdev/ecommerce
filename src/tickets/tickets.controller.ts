@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Get,
   Param,
+  Query,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -14,6 +15,8 @@ import { CreateTicketDto } from './dtos/create-ticket.dto';
 import { GetUser } from 'src/decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Response } from 'express';
+import { RoleGuard } from 'src/guards/role.guard';
+import { pairwise } from 'rxjs';
 
 @Controller('tickets')
 export class TicketsController {
@@ -32,6 +35,25 @@ export class TicketsController {
       data: ticket,
       statusCode: HttpStatus.CREATED,
       message: 'ticket created successfully',
+    });
+  }
+
+  @Get('/')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  async findAll(
+    @Query('limit') limit: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {
+    const tickets = await this.ticketsService.findAll(
+      parseInt(limit),
+      parseInt(page),
+    );
+
+    return res.status(HttpStatus.OK).json({
+      data: tickets,
+      statusCode: HttpStatus.OK,
+      message: 'ticket get successfully',
     });
   }
 

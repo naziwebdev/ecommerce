@@ -42,7 +42,7 @@ export class TicketsService {
   async findOne(id: number, user: User) {
     const ticket = await this.ticketsRepository.findOne({
       where: { id },
-      relations: ['replies', 'replyTo','user'],
+      relations: ['replies', 'replyTo', 'user'],
     });
 
     if (ticket.user.id !== user.id && user.role !== 'admin') {
@@ -52,5 +52,21 @@ export class TicketsService {
     ticket.user = plainToInstance(User, ticket.user);
 
     return ticket;
+  }
+
+  async findAll(limit: number = 2, page: number = 1) {
+    const tickets = await this.ticketsRepository.find({
+      where: { replyTo: null },
+      relations: ['replyTo', 'user'],
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    const transformedTickets = tickets.map((ticket) => ({
+      ...ticket,
+      user: plainToInstance(User, ticket.user),
+    }));
+
+    return transformedTickets;
   }
 }
