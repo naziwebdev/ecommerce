@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-ManyToOne
+  OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Category } from 'src/categories/entities/category.entity';
+import { CartItem } from 'src/carts/entities/cartItem.entity';
 
 @Entity('products')
 export class Product {
@@ -22,14 +24,17 @@ export class Product {
   @Column({ nullable: false, unique: true })
   href: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false,type:'decimal' })
   price: number;
 
   @Column({ nullable: false, default: 0 })
   stock: number;
 
-  @ManyToOne(() => Category , (category) => category.products)
-  category:Category
+  @ManyToOne(() => Category, (category) => category.products)
+  category: Category;
+
+  @OneToMany(() => CartItem, (cartItem) => cartItem.product)
+  cartItems:CartItem[]
 
   @CreateDateColumn({
     name: 'created_at',
