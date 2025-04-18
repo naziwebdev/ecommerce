@@ -77,6 +77,20 @@ export class ProductsService {
     return product;
   }
 
+  async findById(id:number){
+
+    const product = await this.productsRepository.findOne({
+      where:{id},
+    })
+
+    if (!product) {
+      throw new NotFoundException('not found product');
+    }
+
+    return product
+
+  }
+
   async remove(id: number) {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
