@@ -5,11 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Address } from 'src/addresses/entities/address.entity';
 import { UserRoleEnum } from '../enums/user-role-enum';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import { Cart } from 'src/carts/entities/cart.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -39,6 +41,9 @@ export class User {
 
   @OneToMany(() => Ticket, (ticket) => ticket.user)
   tickets: Ticket[];
+
+  @OneToOne(() => Cart , (cart) => cart.user)
+  cart:Cart
 
   @CreateDateColumn({
     name: 'created_at',
