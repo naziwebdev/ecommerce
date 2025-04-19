@@ -6,11 +6,13 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { Address } from 'src/addresses/entities/address.entity';
 import { StatusOrderEnum } from '../enums/status-enum';
 import { User } from 'src/users/entities/user.entity';
+import { OrderItem } from './orderItem.entity';
 
 @Entity('orders')
 export class Order {
@@ -34,6 +36,10 @@ export class Order {
   @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn()
   user: User;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  @JoinColumn()
+  orderItems: OrderItem[];
 
   @CreateDateColumn({
     name: 'created_at',
