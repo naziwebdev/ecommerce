@@ -9,6 +9,7 @@ import { AddressesModule } from './addresses/addresses.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CartModule } from './carts/carts.module';
 import { OrdersModule } from './orders/orders.module';
+import { CheckoutsModule } from './checkouts/checkouts.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { OrdersModule } from './orders/orders.module';
     TicketsModule,
     CartModule,
     OrdersModule,
+    CheckoutsModule,
   ],
   controllers: [],
   providers: [],

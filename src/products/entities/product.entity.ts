@@ -10,6 +10,7 @@ import {
 import { Category } from 'src/categories/entities/category.entity';
 import { CartItem } from 'src/carts/entities/cartItem.entity';
 import { OrderItem } from 'src/orders/entities/orderItem.entity';
+import { CheckoutItem } from 'src/checkouts/entities/checkoutItem.entity';
 
 @Entity('products')
 export class Product {
@@ -39,6 +40,9 @@ export class Product {
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
   orderItems: OrderItem[];
+
+  @OneToMany(() => CheckoutItem, (checkoutItem) => checkoutItem.product)
+  checkoutItems: CheckoutItem[];
 
   @CreateDateColumn({
     name: 'created_at',
