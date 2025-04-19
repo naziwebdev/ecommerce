@@ -1,5 +1,6 @@
 import {
   Column,
+  JoinColumn,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -16,7 +17,8 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User, (user) => user.cart)
+  @OneToOne(() => User, (user) => user.cart, { nullable: false })
+  @JoinColumn()
   user: User;
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.cart)

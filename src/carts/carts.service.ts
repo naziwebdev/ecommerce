@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateCartItemDto } from './dtos/create-cartItem.dto';
 import { User } from 'src/users/entities/user.entity';
 import { ProductsService } from 'src/products/products.service';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CartService {
@@ -22,49 +23,41 @@ export class CartService {
       createCartItemDto.product_id,
     );
 
-    const cart = await this.cartsRepository.findOne({
+    let cart = await this.cartsRepository.findOne({
+      where: { user: { id: user.id } },
       relations: ['user'],
-      where: { user },
     });
-    const priceAtAddingTime = product.price;
 
     if (!cart) {
-      const newCart = await this.cartsRepository.create({ user });
-      await this.cartsRepository.save(newCart);
-      const newCartItem = await this.cartItemsRepository.create({
-        quantity: createCartItemDto.quantity,
-        product,
-        priceAtAddingTime,
-        cart: newCart,
-      });
-      const savedCartItem = await this.cartItemsRepository.save(newCartItem);
-      return savedCartItem;
+      cart = this.cartsRepository.create({ user });
+      await this.cartsRepository.save(cart);
     }
 
     const existingItem = await this.cartItemsRepository.findOne({
-      relations: ['product'],
-      where: { product },
+      where: {
+        product: { id: product.id },
+        cart: { id: cart.id },
+      },
+      relations: ['product', 'cart', 'cart.user'],
     });
 
-    let savedCartItem = null;
-
     if (existingItem) {
-      existingItem.quantity =
-        createCartItemDto.quantity + existingItem.quantity;
-      existingItem.priceAtAddingTime =
-        existingItem.priceAtAddingTime * existingItem.quantity;
+      existingItem.quantity += createCartItemDto.quantity;
+      existingItem.priceAtAddingTime = product.price * existingItem.quantity;
       await this.cartItemsRepository.save(existingItem);
-    } else {
-      const newCartItem = await this.cartItemsRepository.create({
-        quantity: createCartItemDto.quantity,
-        product,
-        priceAtAddingTime,
-        cart,
-      });
-
-      savedCartItem = await this.cartItemsRepository.save(newCartItem);
+      const response = plainToInstance(CartItem, existingItem);
+      response.cart.user = plainToInstance(User, cart.user);
+      return response;
     }
 
-    return existingItem || savedCartItem;
+    const newCartItem = this.cartItemsRepository.create({
+      quantity: createCartItemDto.quantity,
+      product,
+      priceAtAddingTime: product.price,
+      cart,
+    });
+
+    const savedCartItem = await this.cartItemsRepository.save(newCartItem);
+    return plainToInstance(CartItem, savedCartItem);
   }
 }

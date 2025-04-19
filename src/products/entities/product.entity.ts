@@ -24,7 +24,7 @@ export class Product {
   @Column({ nullable: false, unique: true })
   href: string;
 
-  @Column({ nullable: false,type:'decimal' })
+  @Column({ nullable: false,type:'decimal'})
   price: number;
 
   @Column({ nullable: false, default: 0 })
