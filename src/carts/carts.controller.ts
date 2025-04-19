@@ -4,6 +4,7 @@ import {
   Body,
   Res,
   Post,
+  Get,
   HttpStatus,
 } from '@nestjs/common';
 import { CartService } from './carts.service';
@@ -30,6 +31,18 @@ export class CartController {
       data: cartItems,
       statusCode: HttpStatus.CREATED,
       message: 'cartItems added successfully',
+    });
+  }
+
+  @Get('/')
+  @UseGuards(JwtAuthGuard)
+  async getUserCart(@GetUser() user: User, @Res() res: Response) {
+    const cartItems = await this.cartService.getUserCart(user);
+
+    return res.status(HttpStatus.OK).json({
+      data: cartItems,
+      statusCode: HttpStatus.OK,
+      message: 'cartItems send successfully',
     });
   }
 }

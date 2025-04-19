@@ -60,4 +60,23 @@ export class CartService {
     const savedCartItem = await this.cartItemsRepository.save(newCartItem);
     return plainToInstance(CartItem, savedCartItem);
   }
+
+  async getUserCart(user: User) {
+    const userId = user.id;
+    const userCartItems = await this.cartItemsRepository
+      .createQueryBuilder('cartItem')
+      .innerJoinAndSelect('cartItem.cart', 'cart')
+      .innerJoinAndSelect('cart.user', 'user')
+      .innerJoinAndSelect('cartItem.product', 'product')
+      .where('user.id = :userId', { userId })
+      .getMany();
+
+    const transformedCartItems = userCartItems.map((cartItem) => {
+      const transformedCartItem = plainToInstance(CartItem, cartItem);
+      transformedCartItem.cart.user = plainToInstance(User, cartItem.cart.user);
+      return transformedCartItem;
+    });
+
+    return transformedCartItems;
+  }
 }
