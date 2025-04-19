@@ -12,6 +12,7 @@ import { Address } from 'src/addresses/entities/address.entity';
 import { UserRoleEnum } from '../enums/user-role-enum';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { Cart } from 'src/carts/entities/cart.entity';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -42,8 +43,11 @@ export class User {
   @OneToMany(() => Ticket, (ticket) => ticket.user)
   tickets: Ticket[];
 
-  @OneToOne(() => Cart , (cart) => cart.user)
-  cart:Cart
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   @CreateDateColumn({
     name: 'created_at',
