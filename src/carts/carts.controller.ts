@@ -6,6 +6,8 @@ import {
   Post,
   Get,
   HttpStatus,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { CartService } from './carts.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
@@ -43,6 +45,21 @@ export class CartController {
       data: cartItems,
       statusCode: HttpStatus.OK,
       message: 'cartItems send successfully',
+    });
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
+  async remove(
+    @Param('id') id: string,
+    @GetUser() user: User,
+    @Res() res: Response,
+  ) {
+    await this.cartService.remove(parseInt(id), user);
+    return res.status(HttpStatus.OK).json({
+      data: true,
+      statusCode: HttpStatus.OK,
+      message: 'cartItems removed successfully',
     });
   }
 }

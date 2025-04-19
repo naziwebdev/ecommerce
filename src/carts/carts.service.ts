@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cartItem.entity';
@@ -78,5 +78,34 @@ export class CartService {
     });
 
     return transformedCartItems;
+  }
+
+  async remove(id: number, user: User) {
+    const cart = await this.cartsRepository.findOne({
+      where: { user: { id: user.id } },
+    });
+
+    if (!cart) {
+      throw new NotFoundException('not found user cart');
+    }
+
+    const cartItem = await this.cartItemsRepository.findOne({
+      where: { id },
+      relations:['product']
+    });
+
+    if (!cartItem) {
+      throw new NotFoundException('not found this item in cart');
+    }
+
+    if (cartItem && cartItem.quantity > 1) {
+      cartItem.quantity = cartItem.quantity - 1;
+      cartItem.priceAtAddingTime = cartItem.priceAtAddingTime - cartItem.product.price
+      await this.cartItemsRepository.save(cartItem);
+    } else if (cartItem.quantity === 1) {
+      await this.cartItemsRepository.remove(cartItem);
+    }
+
+    return true;
   }
 }
