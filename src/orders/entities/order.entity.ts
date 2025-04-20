@@ -30,7 +30,7 @@ export class Order {
   totalPrice: number;
 
   @Column({nullable: false, unique: true })
-  authourity: string;
+  authority: string;
 
   @ManyToOne(() => Address, (address) => address.orders)
   @JoinColumn()

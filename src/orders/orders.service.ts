@@ -19,14 +19,14 @@ export class OrdersService {
 
   async createOrder(
     totalPrice: number,
-    authourity: string,
+    authority: string,
     user: User,
     address: Address,
   ) {
     const newOrder = await this.ordersRepository.create({
       address,
       user,
-      authourity,
+      authority,
       totalPrice,
       status: StatusOrderEnum.PENDDING,
     });
@@ -46,6 +46,14 @@ export class OrdersService {
       product,
     });
 
-    return await this.ordersRepository.save(newOrderItem);
+    return await this.orderItemsRepository.save(newOrderItem);
+  }
+
+  async findByAuthority(authority: string) {
+    const order = await this.ordersRepository.findOne({
+      where: {authority },
+    });
+
+    return order;
   }
 }

@@ -43,7 +43,7 @@ export class CartService {
 
     if (existingItem) {
       existingItem.quantity += createCartItemDto.quantity;
-      existingItem.priceAtAddingTime = product.price * existingItem.quantity;
+      existingItem.priceAtAddingTime = product.price;
       await this.cartItemsRepository.save(existingItem);
       const response = plainToInstance(CartItem, existingItem);
       response.cart.user = plainToInstance(User, cart.user);

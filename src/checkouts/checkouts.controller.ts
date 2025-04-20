@@ -5,6 +5,8 @@ import {
   Res,
   UseGuards,
   HttpStatus,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { CheckoutsService } from './checkouts.service';
 import { CreateCheckoutDto } from './dtos/create-checkout.dto';
@@ -24,7 +26,6 @@ export class CheckoutsController {
     @Body() body: CreateCheckoutDto,
     @Res() res: Response,
   ) {
-  
     const peymentURL = await this.checkoutsService.createCheckout(
       user,
       body.addressId,
@@ -33,6 +34,20 @@ export class CheckoutsController {
       data: peymentURL,
       statusCode: HttpStatus.CREATED,
       message: 'checkout created successfully',
+    });
+  }
+  @Get('/verify')
+  async verifyCheckout(
+    @Query('Authority') Authority: string,
+    @Res() res: Response,
+  ) {
+    const paymentResult = await this.checkoutsService.verifyCheckout(
+      Authority,
+    );
+    return res.status(HttpStatus.OK).json({
+      data: paymentResult,
+      statusCode: HttpStatus.OK,
+      message: 'checkout verified successfully',
     });
   }
 }

@@ -46,7 +46,6 @@ export class CheckoutsService {
         description,
       });
 
-
       const data = response.data.data;
 
       return {
@@ -79,7 +78,6 @@ export class CheckoutsService {
   }
 
   async createCheckout(user: User, addressId: number) {
-  
     const address = await this.addressesService.findOne(addressId);
     if (!address) {
       throw new NotFoundException('not found address');
@@ -123,7 +121,7 @@ export class CheckoutsService {
       totalPrice,
       address,
       user,
-      authourity: peyment.authority,
+      authority: peyment.authority,
     });
 
     await this.checkoutsRepository.save(newCheckOut);
@@ -139,5 +137,77 @@ export class CheckoutsService {
     }
 
     return peyment.paymentUrl;
+  }
+
+  async verifyCheckout(Authority: string) {
+    const order = await this.ordersService.findByAuthority(Authority);
+    if (order) {
+      throw new BadRequestException('peyment verified already');
+    }
+
+    const checkout = await this.checkoutsRepository.findOne({
+      relations: ['user', 'address'],
+      where: { authority: Authority },
+    });
+
+    if (!checkout) {
+      throw new NotFoundException('not found checkout');
+    }
+
+    const checkoutItems = await this.checkoutItemsRepository.find({
+      relations: ['product'],
+      where: { checkout: { id: checkout.id } },
+    });
+
+    if (checkoutItems.length === 0) {
+      throw new NotFoundException('checkout is empty');
+    }
+
+    const totalPrice = checkoutItems.reduce((total, item) => {
+      return total + item.priceAtPurchaseTime * item.quantity;
+    }, 0);
+
+    const peyment = await this.verifyPayment(totalPrice, Authority);
+    if (![100, 101].includes(peyment.code)) {
+      throw new BadRequestException('peyment is not verified');
+    }
+
+    const newOrder = await this.ordersService.createOrder(
+      totalPrice,
+      Authority,
+      checkout.user,
+      checkout.address,
+    );
+
+    for (const item of checkoutItems) {
+      await this.ordersService.createOrderItem(
+        item.quantity,
+        item.priceAtPurchaseTime,
+        newOrder,
+        item.product,
+      );
+    }
+
+    const userCart = await this.cartsRepository.findOne({
+      relations: ['user'],
+      where: { user: { id: checkout.user.id } },
+    });
+
+    const userCartItems = await this.cartItemsRepository.find({
+      where: { cart: { id: userCart.id } },
+    });
+
+    if (userCartItems.length > 0) {
+      await this.cartItemsRepository.remove(userCartItems);
+    }
+
+    if (checkoutItems.length > 0) {
+      await this.checkoutItemsRepository.remove(checkoutItems);
+    }
+
+    await this.cartsRepository.remove(userCart);
+    await this.checkoutsRepository.remove(checkout);
+
+    return peyment;
   }
 }

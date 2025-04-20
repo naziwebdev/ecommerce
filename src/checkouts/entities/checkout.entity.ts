@@ -22,7 +22,7 @@ import {
     totalPrice: number;
   
     @Column({nullable: false, unique: true })
-    authourity: string;
+    authority: string;
   
     @ManyToOne(() => Address, (address) => address.checkouts)
     @JoinColumn()
