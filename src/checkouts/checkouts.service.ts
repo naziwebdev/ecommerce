@@ -45,4 +45,22 @@ export class CheckoutsService {
       );
     }
   }
+
+  async verifyPayment(amountInRial: number, authority: string) {
+    try {
+      const response: any = await this.zarinpal.post('/verify.json', {
+        merchant_id: this.configService.get<string>('ZARINPAL_MERCHANT_ID'),
+        amount: amountInRial,
+        authority,
+      });
+
+      const data = response.data.data;
+
+      return data;
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to verify payment: ${error.message}`,
+      );
+    }
+  }
 }
