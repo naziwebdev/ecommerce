@@ -21,7 +21,7 @@ import {
     @Column({ type: 'decimal', nullable: false, default: 0 })
     totalPrice: number;
   
-    @Column({ type: 'string', nullable: false, unique: true })
+    @Column({nullable: false, unique: true })
     authourity: string;
   
     @ManyToOne(() => Address, (address) => address.checkouts)
