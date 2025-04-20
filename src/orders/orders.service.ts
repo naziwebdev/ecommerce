@@ -7,6 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Address } from 'src/addresses/entities/address.entity';
 import { StatusOrderEnum } from './enums/status-enum';
 import { Product } from 'src/products/entities/product.entity';
+import { UpdateOrderDto } from './dtos/update-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -68,5 +69,16 @@ export class OrdersService {
     });
 
     return order;
+  }
+
+  async changeStatusOrder(status: UpdateOrderDto, user: User, id: number) {
+    const order = await this.ordersRepository.findOne({
+      where: { id, user: { id: user.id } },
+    });
+    if (!order) {
+      throw new Error('Order not found or does not belong to the user.');
+    }
+    await this.ordersRepository.update(id, { status: status.status });
+    return await this.ordersRepository.findOne({ where: { id } });
   }
 }
